@@ -1,0 +1,117 @@
+basePath: /api/v1
+definitions:
+  bank_internal_controllers_httputils.HTTPError:
+    properties:
+      error:
+        type: string
+    type: object
+  internal_controllers_account.TransactionType:
+    enum:
+    - deposit
+    - withdraw
+    type: string
+    x-enum-varnames:
+    - DepositTransactionType
+    - WithdrawTransactionType
+  internal_controllers_account.createAccountResponseBody:
+    properties:
+      accountID:
+        type: string
+    type: object
+  internal_controllers_account.depositTransactionRequestBody:
+    properties:
+      ammount:
+        type: number
+      type:
+        $ref: '#/definitions/internal_controllers_account.TransactionType'
+    type: object
+  internal_controllers_account.getAccountBalanceResponseBody:
+    properties:
+      balance:
+        type: number
+    type: object
+  internal_controllers_account.withdrawTransactionRequestBody:
+    properties:
+      ammount:
+        type: number
+      type:
+        $ref: '#/definitions/internal_controllers_account.TransactionType'
+    type: object
+info:
+  contact: {}
+  description: Online Bank API
+  title: Bank
+  version: "1.0"
+paths:
+  /accounts:
+    post:
+      description: Create a new account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_controllers_account.createAccountResponseBody'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/bank_internal_controllers_httputils.HTTPError'
+      summary: Create an account
+  /accounts/{accountID}/balance:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the balance of an account
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_controllers_account.getAccountBalanceResponseBody'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/bank_internal_controllers_httputils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/bank_internal_controllers_httputils.HTTPError'
+      summary: Get account balance
+  /accounts/{accountID}/transactions:
+    post:
+      consumes:
+      - application/json
+      description: Perform a withdrawal transaction from the account
+      parameters:
+      - description: Account ID
+        in: path
+        name: accountID
+        required: true
+        type: string
+      - description: Withdraw transaction request body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_controllers_account.withdrawTransactionRequestBody'
+      responses:
+        "200":
+          description: Success response
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/bank_internal_controllers_httputils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/bank_internal_controllers_httputils.HTTPError'
+      summary: Withdraw transaction
+swagger: "2.0"
